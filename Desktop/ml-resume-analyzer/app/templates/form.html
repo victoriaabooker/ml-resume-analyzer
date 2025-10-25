@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume Match Analyzer</title>
+  <style>
+    :root {
+      --bg-page: #1f1f22;            /* dark gray background */
+      --bg-card: #2a2a2f;            /* card background */
+      --border-card: #3a3a40;        /* border gray */
+      --text-main: #f8f9fa;          /* near-white text */
+      --text-dim: #a0a0ad;           /* muted gray text */
+      --accent: #39ff14;             /* VIBRANT neon green */
+      --accent-text-on-dark: #0a0a0a;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-card: 0 24px 48px rgba(0,0,0,0.6);
+    }
+
+    body {
+      background: var(--bg-page);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      color: var(--text-main);
+      margin: 0;
+      padding: 2rem 1rem 4rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    /* HEADER CARD */
+    .header-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      row-gap: .5rem;
+    }
+
+    .title-block {
+      max-width: 80%;
+    }
+
+    .app-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .badge {
+      background: var(--accent);
+      color: var(--accent-text-on-dark);
+      font-size: .7rem;
+      line-height: 1;
+      padding: .4rem .5rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(57,255,20,0.4);
+    }
+
+    .app-desc {
+      color: var(--text-dim);
+      font-size: .8rem;
+      line-height: 1.4;
+      margin-top: .4rem;
+    }
+
+    .mini-meta {
+      font-size: .7rem;
+      color: var(--accent);
+      background: rgba(57,255,20,0.08);
+      border-radius: var(--radius-md);
+      padding: .4rem .6rem;
+      border: 1px solid rgba(57,255,20,0.4);
+      line-height: 1.2;
+      font-weight: 500;
+      text-shadow: 0 0 8px rgba(57,255,20,0.8);
+    }
+
+    /* ANALYZER CARD */
+    .analyzer-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 1.25rem 1.25rem 1rem;
+    }
+
+    .section-label {
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      color: var(--text-dim);
+      margin-bottom: .75rem;
+    }
+
+    label {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--text-main);
+      display: block;
+      margin-bottom: .4rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      font-size: .8rem;
+      padding: .7rem .75rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-card);
+      background: #1a1a1d;
+      color: var(--text-main);
+      font-family: inherit;
+      line-height: 1.4;
+      box-sizing: border-box;
+    }
+
+    textarea:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: -1px;
+      box-shadow: 0 0 12px rgba(57,255,20,0.8);
+    }
+
+    .field-block {
+      margin-bottom: 1rem;
+    }
+
+    button.analyze-btn {
+      margin-top: .5rem;
+      background: var(--accent);
+      color: var(--accent-text-on-dark);
+      border: 0;
+      padding: .7rem 1rem;
+      font-size: .8rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      line-height: 1.2;
+      box-shadow: 0 12px 28px rgba(57,255,20,0.5);
+    }
+
+    button.analyze-btn:active {
+      transform: scale(.98);
+    }
+
+    .loading-text {
+      font-size: .75rem;
+      color: var(--text-dim);
+      margin-top: .5rem;
+      display: none;
+    }
+
+    /* RESULTS CARD */
+    .results-card {
+      margin-top: 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 1rem 1.25rem;
+      display: none;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      row-gap: .5rem;
+    }
+
+    .results-left {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .score-pill {
+      background: var(--accent);
+      color: var(--accent-text-on-dark);
+      font-size: .8rem;
+      font-weight: 600;
+      line-height: 1;
+      padding: .45rem .6rem;
+      border-radius: var(--radius-md);
+      min-width: 3.5rem;
+      text-align: center;
+      box-shadow: 0 12px 28px rgba(57,255,20,0.5);
+      text-shadow: 0 0 8px rgba(10,10,10,0.6);
+    }
+
+    .results-body {
+      margin-top: 1rem;
+      font-size: .8rem;
+      line-height: 1.4;
+      color: var(--text-main);
+    }
+
+    .result-block {
+      margin-bottom: .9rem;
+    }
+
+    .result-label {
+      font-size: .7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      letter-spacing: .03em;
+      margin-bottom: .35rem;
+    }
+
+    .result-value {
+      font-size: .8rem;
+      font-weight: 400;
+      color: var(--text-main);
+      word-break: break-word;
+      white-space: pre-line;
+    }
+
+    .faded {
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <!-- HEADER CARD -->
+    <div class="header-card">
+      <div class="title-block">
+        <div class="app-title">
+          <span>Resume Match Analyzer</span>
+          <span class="badge">beta</span>
+        </div>
+        <div class="app-desc">
+          Paste a job post + your resume. Get score, missing keywords, and what to say so you sound like the job description.
+        </div>
+      </div>
+
+      <div class="mini-meta">
+        FastAPI • NLP<br/>
+        Local only
+      </div>
+    </div>
+
+    <!-- ANALYZER CARD -->
+    <div class="analyzer-card">
+      <div class="section-label">Input</div>
+
+      <div class="field-block">
+        <label>Job Description</label>
+        <textarea id="jobDescription" placeholder="Paste job description / responsibilities here..."></textarea>
+      </div>
+
+      <div class="field-block">
+        <label>Your Resume Text</label>
+        <textarea id="resumeText" placeholder="Paste your resume summary, skills, experience here..."></textarea>
+      </div>
+
+      <button class="analyze-btn" onclick="analyze()">Analyze Match →</button>
+      <div class="loading-text" id="loadingText">Analyzing your resume against the job... ⏳</div>
+    </div>
+
+    <!-- RESULTS CARD -->
+    <div class="results-card" id="resultsCard">
+      <div class="results-header">
+        <div class="results-left">
+          <div>Results</div>
+          <div class="score-pill" id="scorePill">--%</div>
+        </div>
+        <div class="faded" style="font-size:.7rem;" id="headlineText">
+          Resume not analyzed yet
+        </div>
+      </div>
+
+      <div class="results-body">
+        <div class="result-block">
+          <div class="result-label">Missing Keywords</div>
+          <div class="result-value" id="missingKeywords">—</div>
+        </div>
+
+        <div class="result-block">
+          <div class="result-label">Detected Skills</div>
+          <div class="result-value" id="skillsUsed">—</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    async function analyze() {
+      const job_description = document.getElementById("jobDescription").value.trim();
+      const resume_text = document.getElementById("resumeText").value.trim();
+      const loadingEl = document.getElementById("loadingText");
+      const resultsCard = document.getElementById("resultsCard");
+
+      if (!job_description || !resume_text) {
+        alert("Please paste both the job description and your resume.");
+        return;
+      }
+
+      loadingEl.style.display = "block";
+      loadingEl.innerText = "Analyzing your resume against the job... ⏳";
+
+      const response = await fetch("/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          job_description,
+          resume_text
+        })
+      });
+
+      loadingEl.style.display = "none";
+
+      const data = await response.json();
+
+      resultsCard.style.display = "block";
+
+      document.getElementById("scorePill").innerText = data.match_score + "%";
+
+      const headlineText = document.getElementById("headlineText");
+      let headline = "";
+      const scoreNum = data.match_score;
+      if (scoreNum >= 80) {
+        headline = "🔥 Strong match. You're already speaking their language.";
+      } else if (scoreNum >= 50) {
+        headline = "⚠️ Decent match. Add missing keywords before you apply.";
+      } else {
+        headline = "🚧 Low match. You need to tune your resume for this job.";
+      }
+      headlineText.innerText = headline;
+
+      const missingSection = document.getElementById("missingKeywords");
+      if (data.top_missing_keywords && data.top_missing_keywords.length > 0) {
+        missingSection.innerText = data.top_missing_keywords.join(", ");
+      } else {
+        missingSection.innerText = "None 🎉 You're covering the important terms.";
+      }
+
+      const skillsSection = document.getElementById("skillsUsed");
+      if (data.extracted_skills && data.extracted_skills.length > 0) {
+        skillsSection.innerText = data.extracted_skills.join(", ");
+      } else {
+        skillsSection.innerText = "No recognized skills found.";
+      }
+    }
+  </script>
+</body>
+</html>

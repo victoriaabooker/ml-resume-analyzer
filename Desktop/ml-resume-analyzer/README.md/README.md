@@ -37,7 +37,7 @@ It identifies missing keywords, scores alignment, and gives personalized feedbac
    ## 🖼️ App Screenshots
 
 ### Input Page
-<img src="ui-results2.png" width="600"/>
+<img src="ui-results.png" width="600"/>
 
 ### Results Page
-<img src="ui-results.png" width="600"/>
+<img src="ui-results2.png" width="600"/>

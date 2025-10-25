@@ -1,0 +1,18 @@
+# macOS junk
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# VSCode settings
+.vscode/
+
+# System folders we do NOT need
+*/.Trash/
+*/Photo Booth Library/
